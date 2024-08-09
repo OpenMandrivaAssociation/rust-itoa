@@ -1,86 +1,86 @@
+# Rust packages always list license files and docs
+# inside the crate as well as the containing directory
+%undefine _duplicate_files_terminate_build
 %bcond_without check
 %global debug_package %{nil}
 
 %global crate itoa
 
-Name:           rust-%{crate}
-Version:        0.4.7
-Release:        2
-Summary:        Fast functions for printing integer primitives to an io::Write
+Name:           rust-itoa
+Version:        1.0.11
+Release:        1
+Summary:        Fast integer primitive to string conversion
+Group:          Development/Rust
 
-# Upstream license specification: MIT OR Apache-2.0
-License:        MIT or ASL 2.0
+License:        MIT OR Apache-2.0
 URL:            https://crates.io/crates/itoa
 Source:         %{crates_source}
 
 ExclusiveArch:  %{rust_arches}
-%if %{__cargo_skip_build}
-BuildArch:      noarch
-%endif
 
-BuildRequires:  rust-packaging
+BuildRequires:  cargo-rpm-macros >= 24
+BuildRequires:  rust >= 1.36
 
 %global _description %{expand:
-Fast functions for printing integer primitives to an io::Write.}
+Fast integer primitive to string conversion.}
 
 %description %{_description}
 
 %package        devel
 Summary:        %{summary}
+Group:          Development/Rust
 BuildArch:      noarch
+Provides:       crate(itoa) = 1.0.11
+Requires:       cargo
+Requires:       rust >= 1.36
 
 %description    devel %{_description}
 
-This package contains library source intended for building other packages
-which use "%{crate}" crate.
+This package contains library source intended for building other packages which
+use the "%{crate}" crate.
 
 %files          devel
-%license LICENSE-MIT LICENSE-APACHE
-%doc README.md
-%{cargo_registry}/%{crate}-%{version_no_tilde}/
+%license %{crate_instdir}/LICENSE-APACHE
+%license %{crate_instdir}/LICENSE-MIT
+%doc %{crate_instdir}/README.md
+%{crate_instdir}/
 
 %package     -n %{name}+default-devel
 Summary:        %{summary}
+Group:          Development/Rust
 BuildArch:      noarch
+Provides:       crate(itoa/default) = 1.0.11
+Requires:       cargo
+Requires:       crate(itoa) = 1.0.11
 
 %description -n %{name}+default-devel %{_description}
 
-This package contains library source intended for building other packages
-which use "default" feature of "%{crate}" crate.
+This package contains library source intended for building other packages which
+use the "default" feature of the "%{crate}" crate.
 
 %files       -n %{name}+default-devel
-%ghost %{cargo_registry}/%{crate}-%{version_no_tilde}/Cargo.toml
+%ghost %{crate_instdir}/Cargo.toml
 
-%package     -n %{name}+i128-devel
+%package     -n %{name}+no-panic-devel
 Summary:        %{summary}
+Group:          Development/Rust
 BuildArch:      noarch
+Provides:       crate(itoa/no-panic) = 1.0.11
+Requires:       (crate(no-panic/default) >= 0.1.0 with crate(no-panic/default) < 0.2.0~)
+Requires:       cargo
+Requires:       crate(itoa) = 1.0.11
 
-%description -n %{name}+i128-devel %{_description}
+%description -n %{name}+no-panic-devel %{_description}
 
-This package contains library source intended for building other packages
-which use "i128" feature of "%{crate}" crate.
+This package contains library source intended for building other packages which
+use the "no-panic" feature of the "%{crate}" crate.
 
-%files       -n %{name}+i128-devel
-%ghost %{cargo_registry}/%{crate}-%{version_no_tilde}/Cargo.toml
-
-%package     -n %{name}+std-devel
-Summary:        %{summary}
-BuildArch:      noarch
-
-%description -n %{name}+std-devel %{_description}
-
-This package contains library source intended for building other packages
-which use "std" feature of "%{crate}" crate.
-
-%files       -n %{name}+std-devel
-%ghost %{cargo_registry}/%{crate}-%{version_no_tilde}/Cargo.toml
+%files       -n %{name}+no-panic-devel
+%ghost %{crate_instdir}/Cargo.toml
 
 %prep
-%autosetup -n %{crate}-%{version_no_tilde} -p1
+%autosetup -n %{crate}-%{version} -p1
 %cargo_prep
-
-%generate_buildrequires
-%cargo_generate_buildrequires
 
 %build
 %cargo_build
